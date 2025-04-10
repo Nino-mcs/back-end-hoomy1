@@ -1,7 +1,7 @@
-# Utilisation de l'image officielle PHP avec Apache
-FROM php:8.4-apache
+# Récupération de l'image php:8.2-apache
+FROM php:8.2-apache
 
-# Installation des dépendances nécessaires
+# Installation de git, unzip et autres dépendances
 RUN apt-get update && apt-get install -y \
   git \
   unzip \
@@ -9,31 +9,31 @@ RUN apt-get update && apt-get install -y \
   libpng-dev \
   libjpeg-dev \
   libfreetype6-dev \
-  libzip-dev \
   libicu-dev \
-  curl \
-  && docker-php-ext-configure gd --with-freetype --with-jpeg \
-  && docker-php-ext-install gd zip intl \
-  && apt-get clean && rm -rf /var/lib/apt/lists/*
+  curl
+
+# Configuration et installation des extensions PHP
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install gd
+RUN docker-php-ext-install intl
 
 # Installation de Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Activation des extensions PHP nécessaires
+# Activation le module mysqli, pdo et pdo_mysql
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Configuration d'Apache pour utiliser /var/www/html/public comme racine du document
+# Configurer Apache pour utiliser /var/www/html/public comme racine du document
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
-# Activation des modules Apache nécessaires
+# Modification de la configuration Apache pour autoriser les fichiers .htaccess
+RUN echo "<Directory /var/www/html/public>\n\
+  AllowOverride All\n\
+  Require all granted\n\
+  </Directory>" >> /etc/apache2/apache2.conf
+
+# Activer les modules Apache nécessaires
 RUN a2enmod rewrite
-RUN a2enmod proxy proxy_http
-
-# Configuration d'Apache pour utiliser le nom de domaine local
-RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf
-
-# Configuration d'Apache pour conserver l'hôte original dans les redirections
-RUN echo 'ProxyPreserveHost On' >> /etc/apache2/apache2.conf
 
 # Installation de Symfony CLI
 RUN wget https://get.symfony.com/cli/installer -O - | bash \
@@ -45,22 +45,19 @@ COPY custom-php.ini /usr/local/etc/php/conf.d/
 # Installation de Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
-# Installation directe de Node.js 22.x
-RUN apt-get update && apt-get install -y ca-certificates gnupg
-RUN mkdir -p /etc/apt/keyrings
-RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
-RUN apt-get update && apt-get install -y nodejs
-RUN npm install -g npm@latest
+# Installation de NVM
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+# Ajouter NVM à la variable d'environnement PATH
+ENV NVM_DIR=/root/.nvm
+ENV NODE_VERSION=20
+ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+
+# Chargement du script NVM et installation de Node.js
+RUN /bin/bash -c "source $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && nvm use default"
 
 # Configuration des permissions pour le répertoire web
 RUN chown -R www-data:www-data /var/www/html
 
-# Exposition du port 80
+# Exposer le port 80
 EXPOSE 80
-
-# Commande de démarrage d'Apache
-CMD ["apache2-foreground"]
-
-
-
