@@ -45,6 +45,7 @@ class Profile
 
     #[ORM\ManyToOne(inversedBy: 'profiles')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['profile:read'])]
     private ?Image $image = null;
 
     /**
