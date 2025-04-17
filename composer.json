@@ -1,0 +1,8 @@
+{
+    "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.1"
+    },
+    "require": {
+        "fakerphp/faker": "^1.24"
+    }
+}
