@@ -32,7 +32,7 @@ class RoomCrudController extends AbstractCrudController
         //permet de redéfinir le formulaire
         return [
             IdField::new('id')->hideOnForm(),
-            TextField::new('label')
+            TextField::new('label', 'Nom de la pièce'),
         ];
     }
 

@@ -2,13 +2,14 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Device;
 use App\Entity\Room;
+use App\Entity\Device;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
 class DeviceCrudController extends AbstractCrudController
@@ -35,7 +36,12 @@ class DeviceCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm(),
             TextField::new('label'),
             TextField::new('status'),
-            TextField::new('reference')
+            TextField::new('reference'),
+            AssociationField::new('room', 'Pièce') // Champ pour lier une pièce
+                ->setRequired(true) // Rendre le champ obligatoire
+                ->setHelp('Sélectionnez une pièce à laquelle cet appareil est associé'),
+
+
         ];
     }
 
