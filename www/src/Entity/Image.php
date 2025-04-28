@@ -24,9 +24,6 @@ class Image
     #[ORM\OneToMany(targetEntity: Profile::class, mappedBy: 'imageId')]
     private Collection $profiles;
 
-    #[ORM\Column(length: 255)]
-    private ?string $type = null;
-
     public function __construct()
     {
         $this->profiles = new ArrayCollection();
@@ -79,20 +76,8 @@ class Image
         return $this;
     }
 
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
     public function __toString(): string
     {
-        return $this->type;
+        return $this->imagePath;
     }
 }

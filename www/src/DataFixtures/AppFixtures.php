@@ -10,9 +10,9 @@ use App\Entity\DeviceType;
 use App\Entity\DeviceSetting;
 use App\Entity\SettingType;
 use App\Entity\Vibe;
+use App\Entity\Song;
 use App\Entity\Image;
 use App\Entity\Playlist;
-use App\Entity\Song;
 use App\Entity\Event;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -29,258 +29,136 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // Création d'un utilisateur
+        // --- Utilisateur Admin ---
         $user = new User();
         $user->setUsername('admin');
         $user->setPassword($this->encoder->hashPassword($user, 'admin'));
         $user->setRoles(['ROLE_ADMIN']);
         $manager->persist($user);
 
-        // Création d'images
-        $avatar1 = new Image();
-        $avatar1->setImagePath('chemin à definir');
-        $manager->persist($avatar1);
-        // Création d’un profil
-        $profile1 = new Profile();
-        $profile1->setUsername('toto');
-        $profile1->setPassword('1234');
-        $profile1->setImage($avatar1);
-        $manager->persist($profile1);
+        // --- Images pour les profils ---
+        $avatars = [];
+        foreach (['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg', 'avatar4.jpg'] as $path) {
+            $image = new Image();
+            $image->setImagePath($path);
+            $manager->persist($image);
+            $avatars[] = $image;
+        }
 
-        // Création d'images
-        $avatar2 = new Image();
-        $avatar2->setImagePath('chemin à definir');
-        $manager->persist($avatar2);
+        // --- Profils utilisateurs ---
+        $profiles = [];
+        foreach (['toto', 'tata', 'tete', 'titi'] as $index => $username) {
+            $profile = new Profile();
+            $profile->setUsername($username);
+            $profile->setPassword('1234'); // Juste pour l'exemple
+            $profile->setImage($avatars[$index]);
+            $manager->persist($profile);
+            $profiles[] = $profile;
+        }
 
-        $profile2 = new Profile();
-        $profile2->setUsername('tata');
-        $profile2->setImage($avatar2);
-        $profile2->setPassword('1234');
-        $manager->persist($profile2);
+        // --- Images pour les pièces ---
+        $roomImages = [];
+        foreach (['room1.jpg', 'room2.jpg', 'room3.jpg'] as $path) {
+            $image = new Image();
+            $image->setImagePath($path);
+            $manager->persist($image);
+            $roomImages[] = $image;
+        }
 
-        // Création d'images
-        $avatar3 = new Image();
-        $avatar3->setImagePath('chemin à definir');
-        $manager->persist($avatar3);
+        // --- Pièces ---
+        $rooms = [];
+        $roomLabels = ['Salle de bain', 'Salon', 'Chambre'];
+        foreach ($roomLabels as $index => $label) {
+            $room = new Room();
+            $room->setLabel($label);
+            $room->setImage($roomImages[$index]);
+            $manager->persist($room);
+            $rooms[] = $room;
+        }
 
-        $profile3 = new Profile();
-        $profile3->setUsername('tete');
-        $profile3->setPassword('1234');
-        $profile3->setImage($avatar3);
-        $manager->persist($profile3);
+        // --- Types d'appareils ---
+        $deviceTypes = [];
+        foreach (['Lumière', 'Thermostat', 'Ventilateur'] as $label) {
+            $deviceType = new DeviceType();
+            $deviceType->setLabel($label);
+            $manager->persist($deviceType);
+            $deviceTypes[] = $deviceType;
+        }
 
-        // Création d'images
-        $avatar4 = new Image();
-        $avatar4->setImagePath('chemin à definir');
-        $manager->persist($avatar4);
+        // --- Appareils ---
+        $devices = [];
+        $devicesData = [
+            ['room' => $rooms[0], 'type' => $deviceTypes[0], 'label' => 'Lampe de chevet', 'status' => 'active', 'ref' => 'REF123'],
+            ['room' => $rooms[1], 'type' => $deviceTypes[1], 'label' => 'Thermostat salon', 'status' => 'inactive', 'ref' => 'REF124'],
+            ['room' => $rooms[2], 'type' => $deviceTypes[2], 'label' => 'Ventilateur chambre', 'status' => 'active', 'ref' => 'REF125'],
+        ];
+        foreach ($devicesData as $data) {
+            $device = new Device();
+            $device->setRoom($data['room']);
+            $device->setDeviceType($data['type']);
+            $device->setLabel($data['label']);
+            $device->setStatus($data['status']);
+            $device->setReference($data['ref']);
+            $manager->persist($device);
+            $devices[] = $device;
+        }
 
-        $profile4 = new Profile();
-        $profile4->setUsername('titi');
-        $profile4->setPassword('1234');
-        $profile4->setImage($avatar4);
-        $manager->persist($profile4);
+        // --- Types de réglages ---
+        $settingTypes = [];
 
-        // Création d'images
-        $image = new Image();
-        $image->setImagePath('à definir');
-        $manager->persist($image);
-
-        // Création de pièces
-        $room1 = new Room();
-        $room1->setLabel('Salle de bain');
-        $room1->setImage($image);
-        $manager->persist($room1);
-
-        $room2 = new Room();
-        $room2->setLabel('Salon');
-        $room2->setImage($image);
-        $manager->persist($room2);
-
-        // Types d'appareils
-        $lightType = new DeviceType();
-        $lightType->setLabel('Lumière');
-        $manager->persist($lightType);
-
-        $thermoType = new DeviceType();
-        $thermoType->setLabel('Thermostat');
-        $manager->persist($thermoType);
-
-        // Appareils
-        $device1 = new Device();
-        $device1->setRoom($room1);
-        $device1->setDeviceType($lightType);
-        $device1->setLabel('Lampe de chevet');
-        $manager->persist($device1);
-
-        $device2 = new Device();
-        $device2->setRoom($room2);
-        $device2->setDeviceType($thermoType);
-        $device2->setLabel('Thermostat salon');
-        $manager->persist($device2);
-
-        // Types de réglages
         $brightness = new SettingType();
         $brightness->setLabel('Luminosité');
         $brightness->setDataType('integer');
         $manager->persist($brightness);
+        $settingTypes[] = $brightness;
 
         $temperature = new SettingType();
         $temperature->setLabel('Température');
         $temperature->setDataType('integer');
         $manager->persist($temperature);
+        $settingTypes[] = $temperature;
 
-        // Réglages
-        $setting1 = new DeviceSetting();
-        $setting1->setDevice($device1);
-        $setting1->setSettingType($brightness);
-        $setting1->setValue('75');
-        $manager->persist($setting1);
+        // --- Réglages des appareils ---
+        $deviceSettingsData = [
+            ['device' => $devices[0], 'setting' => $brightness, 'value' => '75'],
+            ['device' => $devices[1], 'setting' => $temperature, 'value' => '22'],
+        ];
+        foreach ($deviceSettingsData as $data) {
+            $deviceSetting = new DeviceSetting();
+            $deviceSetting->setDevice($data['device']);
+            $deviceSetting->setSettingType($data['setting']);
+            $deviceSetting->setValue($data['value']);
+            $manager->persist($deviceSetting);
+        }
 
-        $setting2 = new DeviceSetting();
-        $setting2->setDevice($device2);
-        $setting2->setSettingType($temperature);
-        $setting2->setValue('22');
-        $manager->persist($setting2);
+        // --- Playlists ---
+        $playlists = [];
+        foreach (['Détente Soirée', 'Concentration Zen'] as $label) {
+            $playlist = new Playlist();
+            $playlist->setLabel($label);
+            $manager->persist($playlist);
+            $playlists[] = $playlist;
+        }
 
-        // Playlist et Song
-        $playlist = new Playlist();
-        $playlist->setLabel('Détente Soirée');
-        $manager->persist($playlist);
-
-        $playlist2 = new Playlist();
-        $playlist2->setLabel('Concentration Zen');
-        $manager->persist($playlist2);
-
-        $song3 = new Song();
-        $song3->setLabel('Calm Flow');
-        $song3->setArtist('Zen Master');
-        $song3->setDuration(new \DateTime('00:05:00'));
-        $song3->setFilePath('chemin');
-        $manager->persist($song3);
-
-        $song4 = new Song();
-        $song4->setLabel('Deep Focus');
-        $song4->setArtist('Focus Beats');
-        $song4->setDuration(new \DateTime('00:04:45'));
-        $song4->setFilePath('chemin');
-        $manager->persist($song4);
-
-        $playlist2->addPlaylistSong($song3);
-        $playlist2->addPlaylistSong($song4);
-
-        $playlist3 = new Playlist();
-        $playlist3->setLabel('Énergie Workout');
-        $manager->persist($playlist3);
-
-        $song5 = new Song();
-        $song5->setLabel('Power Mode');
-        $song5->setArtist('Energy Vibes');
-        $song5->setDuration(new \DateTime('00:03:15'));
-        $song5->setFilePath('chemin');
-        $manager->persist($song5);
-
-        $song6 = new Song();
-        $song6->setLabel('Pump It');
-        $song6->setArtist('Workout Hero');
-        $song6->setDuration(new \DateTime('00:03:50'));
-        $song6->setFilePath('chemin');
-        $manager->persist($song6);
-
-        $playlist3->addPlaylistSong($song5);
-        $playlist3->addPlaylistSong($song6);
-
-        // Création de chansons
-        $song1 = new Song();
-        $song1->setLabel('Song 1');
-        $song1->setArtist('Artist 1');
-        $song1->setDuration(new \DateTime('00:03:30'));
-        $song1->setFilePath('à definir son');
-        $manager->persist($song1);
-
-        $song2 = new Song();
-        $song2->setLabel('Song 2');
-        $song2->setArtist('Artist 2');
-        $song2->setDuration(new \DateTime('00:04:00'));
-        $song2->setFilePath('son à definir');
-        $manager->persist($song2);
-
-        // Ajouter les chansons à la playlist en utilisant la méthode addPlaylistSong
-        $playlist->addPlaylistSong($song1);
-        $playlist->addPlaylistSong($song2);
-
-        // Création de plusieurs vibes dynamiquement
+        // --- Vibes ---
         $vibesData = [
             [
-                'label' => 'Détente Soir',
+                'label' => 'Relax Chill',
                 'energy' => 'low',
                 'stress' => 'low',
-                'motivation' => 'medium',
-                'profile' => $profile1,
-                'playlist' => $playlist,
-                'image' => $image,
+                'motivation' => 'low',
+                'profile' => $profiles[0],
+                'image' => $avatars[0],
+                'playlist' => $playlists[0],
             ],
             [
                 'label' => 'Morning Boost',
                 'energy' => 'high',
                 'stress' => 'low',
                 'motivation' => 'high',
-                'profile' => $profile2,
-                'playlist' => $playlist,
-                'image' => $image,
-            ],
-            [
-                'label' => 'Relax Total',
-                'energy' => 'low',
-                'stress' => 'low',
-                'motivation' => 'low',
-                'profile' => $profile3,
-                'playlist' => $playlist,
-                'image' => $image,
-            ],
-            [
-                'label' => 'Concentration Max',
-                'energy' => 'medium',
-                'stress' => 'medium',
-                'motivation' => 'high',
-                'profile' => $profile4,
-                'playlist' => $playlist,
-                'image' => $image,
-            ],
-            [
-                'label' => 'Énergie Matinale',
-                'energy' => 'high',
-                'stress' => 'low',
-                'motivation' => 'high',
-                'profile' => $profile1,
-                'playlist' => $playlist,
-                'image' => $image,
-            ],
-            [
-                'label' => 'Focus Intense',
-                'energy' => 'medium',
-                'stress' => 'low',
-                'motivation' => 'high',
-                'profile' => $profile2,
-                'playlist' => $playlist,
-                'image' => $image,
-            ],
-            [
-                'label' => 'Chill Pluie',
-                'energy' => 'low',
-                'stress' => 'medium',
-                'motivation' => 'low',
-                'profile' => $profile3,
-                'playlist' => $playlist,
-                'image' => $image,
-            ],
-            [
-                'label' => 'Ambiance Nocturne',
-                'energy' => 'medium',
-                'stress' => 'low',
-                'motivation' => 'medium',
-                'profile' => $profile4,
-                'playlist' => $playlist,
-                'image' => $image,
+                'profile' => $profiles[1],
+                'image' => $avatars[1],
+                'playlist' => $playlists[1],
             ],
         ];
 
@@ -291,27 +169,11 @@ class AppFixtures extends Fixture
             $vibe->setStress($data['stress']);
             $vibe->setMotivation($data['motivation']);
             $vibe->setProfile($data['profile']);
-            $vibe->setPlaylist($data['playlist']);
             $vibe->setImage($data['image']);
+            $vibe->setPlaylist($data['playlist']);
             $manager->persist($vibe);
-
-            $event = new Event();
-            $event->setLabel('Événement pour ' . $data['label']);
-            $event->setDateStart(new \DateTime('+1 day'));
-            $event->setDateEnd(new \DateTime('+1 day +2 hours'));
-            $event->setVibe($vibe);
-            $manager->persist($event);
         }
 
-        // Event
-        $event = new Event();
-        $event->setLabel('Soirée détente');
-        $event->setDateStart(new \DateTime('+1 day'));
-        $event->setDateEnd(new \DateTime('+1 day +2 hours'));
-        $event->setVibe($vibe);
-        $manager->persist($event);
-
-        // Flush les données dans la base de données
         $manager->flush();
     }
 }
