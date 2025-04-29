@@ -24,4 +24,29 @@ class RoomController extends AbstractController
 
         return $this->json($data);
     }
+
+
+    #[Route('/api/room/{id}', name: 'api_room_detail', methods: ['GET'])]
+    public function getRoomDetail(int $id, RoomRepository $roomRepository): JsonResponse
+    {
+        $room = $roomRepository->find($id);
+
+        if (!$room) {
+            return $this->json(['error' => 'Room not found'], 404);
+        }
+
+        $data = [
+            'id' => $room->getId(),
+            'label' => $room->getLabel(),
+            'devices' => array_map(function ($device) {
+                return [
+                    'id' => $device->getId(),
+                    'label' => $device->getLabel(),
+                    'reference' => $device->getReference(),
+                ];
+            }, $room->getDevices()->toArray()),
+        ];
+
+        return $this->json($data);
+    }
 }
