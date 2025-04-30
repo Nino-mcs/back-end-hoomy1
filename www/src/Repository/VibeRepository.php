@@ -40,4 +40,14 @@ class VibeRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findByProfileId($profileId)
+    {
+        return $this->createQueryBuilder('v')
+            ->andWhere('v.profile = :profileId')
+            ->setParameter('profileId', $profileId)
+            ->orderBy('v.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

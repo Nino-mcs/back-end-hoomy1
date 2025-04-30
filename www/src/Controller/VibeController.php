@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Vibe;
+use App\Repository\VibeRepository;
 use App\Repository\ProfileRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,5 +51,21 @@ class VibeController extends AbstractController
         }
 
         return $this->json(['success' => true, 'message' => 'Appareil ajouté avec succès !']);
+    }
+
+
+    #[Route('/api/vibe', name: 'get_vibes', methods: ['GET'])]
+    public function getVibes(Request $request, VibeRepository $vibeRepo): JsonResponse
+    {
+        $profileId = $request->query->get('profileId');
+        if (!$profileId) {
+            return new JsonResponse(['error' => 'profileId est requis'], 400);
+        }
+        $vibes = $vibeRepo->findByProfileId($profileId);
+
+        return $this->json($vibes, 200, [], ['groups' => 'vibe:read']);
+
+
+        return new JsonResponse($vibes);
     }
 }
