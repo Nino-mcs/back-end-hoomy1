@@ -39,7 +39,7 @@ class VibeCrudController extends AbstractCrudController
             TextField::new('energy', 'energie'),
             TextField::new('stress', 'stresse'),
             TextField::new('motivation', 'motivation'),
-            AssociationField::new('profileId', 'Profil') // Champ pour lier un profil
+            AssociationField::new('profile', 'Profil') // Champ pour lier un profil
                 ->setRequired(true) // Rendre le champ obligatoire
                 ->setHelp('Sélectionnez un profil à laquelle cette ambiance est associée'),
         ];
