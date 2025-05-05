@@ -2,20 +2,43 @@
 
 namespace App\Entity;
 
-use App\Repository\ImageRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ImageRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
+
+
+#[ApiResource(
+    //autorisation des route que l'on veut acceder
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Patch()
+    ],
+    normalizationContext: ['groups' => ['image:read']],
+    denormalizationContext: ['groups' => ['image:write']]
+
+)]
+
+
+
 class Image
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['profile:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['profile:read'])]
     private ?string $imagePath = null;
 
     /**
@@ -23,6 +46,10 @@ class Image
      */
     #[ORM\OneToMany(targetEntity: Profile::class, mappedBy: 'imageId')]
     private Collection $profiles;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['profile:read'])]
+    private ?string $type = null;
 
     public function __construct()
     {
@@ -76,8 +103,20 @@ class Image
         return $this;
     }
 
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
     public function __toString(): string
     {
-        return $this->imagePath;
+        return $this->type;
     }
 }
