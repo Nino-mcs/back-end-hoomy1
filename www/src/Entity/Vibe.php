@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\VibeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\VibeRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: VibeRepository::class)]
 class Vibe
@@ -15,15 +16,19 @@ class Vibe
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['vibe:read'])]
     #[ORM\Column(length: 255)]
     private ?string $label = null;
 
+    #[Groups(['vibe:read'])]
     #[ORM\Column(length: 255)]
     private ?string $energy = null;
 
+    #[Groups(['vibe:read'])]
     #[ORM\Column(length: 255)]
     private ?string $stress = null;
 
+    #[Groups(['vibe:read'])]
     #[ORM\Column(length: 255)]
     private ?string $motivation = null;
 

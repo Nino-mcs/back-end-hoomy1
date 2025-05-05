@@ -9,6 +9,7 @@ use App\Entity\Device;
 use App\Entity\Event;
 use App\Entity\Image;
 use App\Entity\Profile;
+use App\Entity\Vibe;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -87,6 +88,10 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Evenements', 'fa fa-credit-card')->setSubItems([
             MenuItem::linkToCrud('Ajouter un évenement', 'fa fa-plus-circle', Event::class)->setAction(Crud::PAGE_NEW),
             MenuItem::linkToCrud('Voir les évenements', 'fa fa-eye', Event::class)
+        ]);
+        yield MenuItem::subMenu('Ambiances', 'fa fa-credit-card')->setSubItems([
+            MenuItem::linkToCrud('Ajouter une ambiance', 'fa fa-plus-circle', Vibe::class)->setAction(Crud::PAGE_NEW),
+            MenuItem::linkToCrud('Voir les ambiances', 'fa fa-eye', Vibe::class)
         ]);
     }
 }

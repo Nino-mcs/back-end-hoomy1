@@ -34,8 +34,8 @@ class EventCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             TextField::new('label', 'Intitulé'),
-            TextField::new('dateStart', 'date de début'),
-            TextField::new('dateEnd', 'date de fin'),
+            TextField::new('dateStart', 'Date de début'),
+            TextField::new('dateEnd', 'Date de fin'),
             TextField::new('recurrence', 'Récurrence'),
 
         ];

@@ -22,7 +22,7 @@ class RoomCrudController extends AbstractCrudController
         //permet de renommer les différentes pages
         return $crud
             ->setPageTitle(Crud::PAGE_INDEX, 'Liste des pièces')
-            ->setPageTitle(Crud::PAGE_NEW, 'Ajouter une pièces')
+            ->setPageTitle(Crud::PAGE_NEW, 'Ajouter une pièce')
             ->setPageTitle(Crud::PAGE_EDIT, 'Modifier une pièce');
     }
 
@@ -32,7 +32,7 @@ class RoomCrudController extends AbstractCrudController
         //permet de redéfinir le formulaire
         return [
             IdField::new('id')->hideOnForm(),
-            TextField::new('label')
+            TextField::new('label', 'Nom de la pièce'),
         ];
     }
 
