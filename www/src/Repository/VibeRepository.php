@@ -16,6 +16,19 @@ class VibeRepository extends ServiceEntityRepository
         parent::__construct($registry, Vibe::class);
     }
 
+    public function findByProfileIdWithRelations(int $profileId): array
+    {
+        return $this->createQueryBuilder('v')
+            ->leftJoin('v.image', 'i')->addSelect('i')
+            ->leftJoin('v.playlist', 'p')->addSelect('p')
+            ->leftJoin('v.profile', 'pr')->addSelect('pr')
+            ->andWhere('pr.id = :id')
+            ->setParameter('id', $profileId)
+            ->getQuery()
+            ->getResult();
+    }
+
+
     //    /**
     //     * @return Vibe[] Returns an array of Vibe objects
     //     */

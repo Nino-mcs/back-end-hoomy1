@@ -2,39 +2,49 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ApiResource()]
 class Event
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['event:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['event:read'])]
     private ?string $label = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['event:read'])]
     private ?\DateTimeInterface $dateStart = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['event:read'])]
     private ?\DateTimeInterface $dateEnd = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['event:read'])]
     private ?string $recurrence = null;
 
     /**
      * @var Collection<int, Room>
      */
     #[ORM\ManyToMany(targetEntity: Room::class, mappedBy: 'roomEvent')]
+    #[Groups(['event:read'])]
     private Collection $rooms;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
+    #[Groups(['event:read'])]
     private ?Vibe $vibe = null;
 
     public function __construct()
@@ -55,7 +65,6 @@ class Event
     public function setLabel(string $label): static
     {
         $this->label = $label;
-
         return $this;
     }
 
@@ -67,7 +76,6 @@ class Event
     public function setDateStart(\DateTimeInterface $dateStart): static
     {
         $this->dateStart = $dateStart;
-
         return $this;
     }
 
@@ -79,7 +87,6 @@ class Event
     public function setDateEnd(\DateTimeInterface $dateEnd): static
     {
         $this->dateEnd = $dateEnd;
-
         return $this;
     }
 
@@ -91,7 +98,6 @@ class Event
     public function setRecurrence(string $recurrence): static
     {
         $this->recurrence = $recurrence;
-
         return $this;
     }
 
@@ -109,7 +115,6 @@ class Event
             $this->rooms->add($room);
             $room->addRoomEvent($this);
         }
-
         return $this;
     }
 
@@ -118,7 +123,6 @@ class Event
         if ($this->rooms->removeElement($room)) {
             $room->removeRoomEvent($this);
         }
-
         return $this;
     }
 
@@ -130,7 +134,6 @@ class Event
     public function setVibe(?Vibe $vibe): static
     {
         $this->vibe = $vibe;
-
         return $this;
     }
 }

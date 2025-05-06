@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!
+{% endblock %}
+
+{% block body %}
+	<form method="post" class="max-w-md mx-auto mt-10 p-8 bg-pink-100 rounded-3xl shadow-xl border-4 border-yellow-300">
+		{% if error %}
+			<div class="mb-4 p-4 bg-red-300 text-red-900 rounded-xl shadow-md border-2 border-red-500 animate-shake">
+				{{ error.messageKey|trans(error.messageData, 'security') }}
+			</div>
+		{% endif %}
+
+		{% if app.user %}
+			<div class="mb-4 text-green-700 font-semibold">
+				You are logged in as
+				{{ app.user.userIdentifier }},
+				<a href="{{ path('app_logout') }}" class="underline hover:text-red-500 transition-all">Logout</a>
+			</div>
+		{% endif %}
+
+		<h1 class="text-3xl font-bold mb-6 text-center text-purple-600 underline decoration-wavy">
+			Connexion
+		</h1>
+
+		<label for="username" class="block text-blue-900 font-semibold mb-1">Username</label>
+		<input type="text" value="{{ last_username }}" name="_username" id="username" class="w-full mb-4 p-3 border-2 border-blue-400 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 bg-white shadow-inner" autocomplete="username" required autofocus>
+
+		<label for="password" class="block text-blue-900 font-semibold mb-1">Password</label>
+		<input type="password" name="_password" id="password" class="w-full mb-4 p-3 border-2 border-blue-400 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 bg-white shadow-inner" autocomplete="current-password" required>
+
+		<input
+		type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+		{#
+						            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+						            See https://symfony.com/doc/current/security/remember_me.html
+						 
+						            <div class="checkbox mb-3">
+						<input type="checkbox" name="_remember_me" id="_remember_me">
+						<label for="_remember_me">Remember me</label>
+						</div>
+						        #}
+
+		<button type="submit" class="mt-6 w-full py-3 px-4 bg-gradient-to-r from-green-400 via-yellow-300 to-pink-400 text-white font-bold rounded-full shadow-lg hover:scale-105 transform transition-all duration-300 hover:rotate-1">
+			🚀 Let's goooo !
+		</button>
+	</form>
+{% endblock %}
